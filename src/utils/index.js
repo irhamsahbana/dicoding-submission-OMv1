@@ -18,4 +18,48 @@ const mapAlbumSongs = (results) => {
   return album;
 }
 
-module.exports = { mapAlbumSongs };
+const mapDBToModelPlaylist = (dataFromDB) => {
+  const playlist = {
+    id: dataFromDB[0].id,
+    name: dataFromDB[0].name,
+    username: dataFromDB[0].username,
+    songs: [],
+  };
+
+  dataFromDB.forEach((el) => {
+    const song = {
+      id: el.songId,
+      title: el.title,
+      performer: el.performer,
+    };
+
+    playlist.songs.push(song);
+  });
+
+  return playlist;
+};
+
+const mapDBToModelActivity = (dataFromDB) => {
+  const data = {
+    playlistId: dataFromDB[0].id,
+    activities: [],
+  };
+
+  dataFromDB.forEach((el) => {
+    const activity = {
+      username: el.username,
+      title: el.title,
+      action: el.action,
+      time: el.time,
+    };
+
+    data.activities.push(activity);
+  });
+  return data;
+};
+
+module.exports = {
+  mapAlbumSongs,
+  mapDBToModelPlaylist,
+  mapDBToModelActivity,
+};

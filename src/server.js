@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
+const Jwt = require('@hapi/jwt');
 const ClientError = require('./exceptions/ClientError');
 
 // albums
@@ -13,6 +14,32 @@ const songs = require('./api/songs');
 const SongService = require('./services/postgres/SongService');
 const SongValidator = require('./validator/songs');
 
+// users
+const users = require('./api/users');
+const UserService = require('./services/postgres/UserService');
+const UserValidator = require('./validator/users');
+
+// authentications
+const authentications = require('./api/authentications');
+const AuthenticationService = require('./services/postgres/AuthenticationService');
+const AuthenticationValidator = require('./validator/authentications');
+const tokenManager = require('./tokenize/TokenManager');
+
+// playlists
+const playlists = require('./api/playlists');
+const PlaylistService = require('./services/postgres/PlaylistService');
+const PlaylistValidator = require('./validator/playlists');
+
+// playlist songs
+const playlistSongs = require('./api/playlistSongs');
+const PlaylistSongService = require('./services/postgres/PlaylistSongService');
+const PlaylistSongValidator = require('./validator/playlistSongs');
+
+// collaborations
+const collaborations = require('./api/collaborations');
+const CollaborationService = require('./services/postgres/CollaborationService');
+const CollaborationValidator = require('./validator/collaborations');
+
 const init = async () => {
   const server = Hapi.server({
     port: process.env.PORT,
@@ -24,8 +51,37 @@ const init = async () => {
     },
   });
 
+  // registrasi plugin eksternal
+  await server.register([
+    {
+      plugin: Jwt,
+    },
+  ]);
+
+  server.auth.strategy('playlistsapp_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+      },
+    }),
+  });
+
   const albumService = new AlbumService();
   const songService = new SongService();
+  const userService = new UserService();
+  const authenticationService = new AuthenticationService();
+
+  const playlistService = new PlaylistService(null);
+  const playlisSongService = new PlaylistSongService(songService);
+  const collaborationService = new CollaborationService();
 
   await server.register([
     {
@@ -40,6 +96,45 @@ const init = async () => {
       options: {
         service: songService,
         validator: SongValidator,
+      },
+    },
+    {
+      plugin: users,
+      options: {
+        service: userService,
+        validator: UserValidator,
+      },
+    },
+    {
+      plugin: authentications,
+      options: {
+        service: authenticationService,
+        userService: userService,
+        tokenManager: tokenManager,
+        validator: AuthenticationValidator,
+      },
+    },
+    {
+      plugin: playlists,
+      options: {
+        service: playlistService,
+        validator: PlaylistValidator,
+      },
+    },
+    {
+      plugin: playlistSongs,
+      options: {
+        service: playlisSongService,
+        playlistService,
+        validator: PlaylistSongValidator,
+      },
+    },
+    {
+      plugin: collaborations,
+      options: {
+        service: collaborationService,
+        playlistService,
+        validator: CollaborationValidator,
       },
     }
   ]);
@@ -62,6 +157,7 @@ const init = async () => {
       if (!response.isServer) {
         return h.continue;
       }
+      console.log("🚀 ~ file: server.js:160 ~ server.ext ~ response:", response)
       // penanganan server error sesuai kebutuhan
       const newResponse = h.response({
         status: 'error',
