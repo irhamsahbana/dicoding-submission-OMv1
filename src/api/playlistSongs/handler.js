@@ -12,15 +12,9 @@ class PlaylistSongHandler {
   async postPlaylistSongHandler(request, h) {
     this._validator.validatePlaylistSongPayload(request.payload);
 
-    const {debug} = request.query;
-
     const { id: credentialId } = request.auth.credentials;
     const { songId } = request.payload;
     const { id: playlistId } = request.params;
-
-    if (debug) {
-      console.log('postPlaylistSongHandler', {credentialId, songId, playlistId});
-    }
 
     await this._playlistService.verifyPlaylistAccess(playlistId, credentialId);
     const playlistSongId = await this._service.addPlaylistSong(playlistId, songId);

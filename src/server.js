@@ -157,7 +157,6 @@ const init = async () => {
       if (!response.isServer) {
         return h.continue;
       }
-      console.log("🚀 ~ file: server.js:160 ~ server.ext ~ response:", response)
       // penanganan server error sesuai kebutuhan
       const newResponse = h.response({
         status: 'error',

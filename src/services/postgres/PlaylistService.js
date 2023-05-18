@@ -105,12 +105,9 @@ class PlaylistService {
     } catch (error) {
       if (error instanceof NotFoundError) throw error;
 
-      console.log("tangkap");
-
       try {
         await this._collaborationService.verifyCollaborator(playlistId, userId);
       } catch {
-        console.log("tangkap bawah");
         throw error;
       }
     }
