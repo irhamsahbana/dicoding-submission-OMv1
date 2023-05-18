@@ -42,7 +42,6 @@ class SongHandler {
 
   async getSongsHandler(request) {
     const params = request.query;
-    console.log("🚀 ~ file: handler.js:45 ~ SongHandler ~ getSongsHandler ~ params:", params)
 
     const result = await this._service.getSongs(params);
     return {

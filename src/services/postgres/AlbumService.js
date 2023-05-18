@@ -48,9 +48,8 @@ class AlbumService {
     };
 
     let result = await this._pool.query(query);
-    console.log("🚀 ~ file: AlbumService.js:51 ~ AlbumService ~ getAlbumById ~ result:", result.rows)
-    if (!result.rows.length)
-      throw new NotFoundError('Album tidak ditemukan');
+
+    if (!result.rows.length) throw new NotFoundError('Album tidak ditemukan');
 
     result = mapAlbumSongs(result.rows);
 

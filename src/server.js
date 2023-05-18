@@ -58,7 +58,6 @@ const init = async () => {
         newResponse.code(response.statusCode);
         return newResponse;
       }
-      // console.log("🚀 ~ file: server.js:61 ~ server.ext ~ response:", response)
       // mempertahankan penanganan client error oleh hapi secara native, seperti 404, etc.
       if (!response.isServer) {
         return h.continue;
