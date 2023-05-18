@@ -13,7 +13,7 @@ class AlbumService {
 
   async getAlbums() {
     const result = await this._pool.query(`
-      SELECT * FROM albums JOIN songs ON albums.id = songs.album_id
+      SELECT * FROM albums JOIN songs ON albums.id = songs."albumId"
     `);
 
     result = mapAlbumSongs(result.rows);
@@ -49,7 +49,7 @@ class AlbumService {
 
     let result = await this._pool.query(query);
 
-    if (!result.rows.length) throw new NotFoundError('Album tidak ditemukan');
+    if (!result.rowCount) throw new NotFoundError('Album tidak ditemukan');
 
     result = mapAlbumSongs(result.rows);
 
@@ -64,8 +64,7 @@ class AlbumService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length)
-      throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
+    if (!result.rowCount) throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
 
     return result.rows[0].id;
   }
@@ -78,8 +77,7 @@ class AlbumService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length)
-      throw new NotFoundError('Album gagal diperbarui. Id tidak ditemukan');
+    if (!result.rowCount) throw new NotFoundError('Album gagal diperbarui. Id tidak ditemukan');
 
     return result.rows[0].id;
   }

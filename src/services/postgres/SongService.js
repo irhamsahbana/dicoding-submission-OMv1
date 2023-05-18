@@ -34,9 +34,7 @@ class SongService {
       };
     }
 
-    const result = await this._pool.query(query);
-
-    return result.rows;
+    return (await this._pool.query(query)).rows;
   }
 
   async addSong({ title, year, performer, genre, duration, albumId}) {
@@ -50,9 +48,7 @@ class SongService {
       values: [id, title, year, performer, genre, duration, albumId],
     };
 
-    const result = await this._pool.query(query);
-
-    return result.rows[0].id;
+    return (await this._pool.query(query)).rows[0].id;
   }
 
   async getSongById(id) {
@@ -63,8 +59,7 @@ class SongService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length)
-      throw new NotFoundError('Lagu tidak ditemukan');
+    if (!result.rowCount) throw new NotFoundError('Lagu tidak ditemukan');
 
     return result.rows[0];
   }
@@ -77,8 +72,7 @@ class SongService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length)
-      throw new NotFoundError('Lagu gagal dihapus. Id tidak ditemukan');
+    if (!result.rowCount) throw new NotFoundError('Lagu gagal dihapus. Id tidak ditemukan');
   }
 
   async editSongById(id, { title, year, performer, genre, duration, albumId}) {
@@ -93,9 +87,7 @@ class SongService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length)
-      throw new NotFoundError('Gagal memperbarui lagu. Id tidak ditemukan');
-
+    if (!result.rowCount) throw new NotFoundError('Gagal memperbarui lagu. Id tidak ditemukan');
   }
 
 }
