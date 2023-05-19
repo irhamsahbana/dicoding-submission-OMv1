@@ -16,9 +16,7 @@ class AlbumService {
       SELECT * FROM albums JOIN songs ON albums.id = songs."albumId"
     `);
 
-    result = mapAlbumSongs(result.rows);
-
-    return result;
+    return mapAlbumSongs(result.rows);
   }
 
   async addAlbum({ name, year }) {
@@ -31,8 +29,7 @@ class AlbumService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows[0].id)
-      throw new InvariantError('Album gagal ditambahkan');
+    if (!result.rows[0].id) throw new InvariantError('Album gagal ditambahkan');
 
     return result.rows[0].id;
   }

@@ -8,7 +8,7 @@ const albums = require('./api/albums');
 const AlbumService = require('./services/postgres/AlbumService');
 const AlbumValidator = require('./validator/albums');
 
-//songs
+// songs
 const songs = require('./api/songs');
 const SongService = require('./services/postgres/SongService');
 const SongValidator = require('./validator/songs');
@@ -41,14 +41,13 @@ const init = async () => {
         service: songService,
         validator: SongValidator,
       },
-    }
+    },
   ]);
 
   server.ext('onPreResponse', (request, h) => {
     // mendapatkan konteks response dari request
     const { response } = request;
     if (response instanceof Error) {
-
       // penanganan client error secara internal.
       if (response instanceof ClientError) {
         const newResponse = h.response({

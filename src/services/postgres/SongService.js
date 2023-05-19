@@ -37,9 +37,10 @@ class SongService {
     return (await this._pool.query(query)).rows;
   }
 
-  async addSong({ title, year, performer, genre, duration, albumId}) {
+  async addSong({
+    title, year, performer, genre, duration, albumId,
+  }) {
     const id = `song-${nanoid(16)}`;
-
 
     const query = {
       text: `
@@ -75,7 +76,9 @@ class SongService {
     if (!result.rowCount) throw new NotFoundError('Lagu gagal dihapus. Id tidak ditemukan');
   }
 
-  async editSongById(id, { title, year, performer, genre, duration, albumId}) {
+  async editSongById(id, {
+    title, year, performer, genre, duration, albumId,
+  }) {
     const query = {
       text: `
       UPDATE songs
@@ -89,7 +92,6 @@ class SongService {
 
     if (!result.rowCount) throw new NotFoundError('Gagal memperbarui lagu. Id tidak ditemukan');
   }
-
 }
 
 module.exports = SongService;
