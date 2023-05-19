@@ -1,4 +1,4 @@
-exports.up = pgm => {
+exports.up = (pgm) => {
   pgm.createTable('playlists', {
     id: {
       type: 'VARCHAR(50)',
@@ -15,6 +15,6 @@ exports.up = pgm => {
   });
 };
 
-exports.down = pgm => {
+exports.down = (pgm) => {
   pgm.dropTable('playlists');
 };

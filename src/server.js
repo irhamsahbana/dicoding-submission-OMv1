@@ -9,7 +9,7 @@ const albums = require('./api/albums');
 const AlbumService = require('./services/postgres/AlbumService');
 const AlbumValidator = require('./validator/albums');
 
-//songs
+// songs
 const songs = require('./api/songs');
 const SongService = require('./services/postgres/SongService');
 const SongValidator = require('./validator/songs');
@@ -109,8 +109,8 @@ const init = async () => {
       plugin: authentications,
       options: {
         service: authenticationService,
-        userService: userService,
-        tokenManager: tokenManager,
+        userService,
+        tokenManager,
         validator: AuthenticationValidator,
       },
     },
@@ -136,14 +136,13 @@ const init = async () => {
         playlistService,
         validator: CollaborationValidator,
       },
-    }
+    },
   ]);
 
   server.ext('onPreResponse', (request, h) => {
     // mendapatkan konteks response dari request
     const { response } = request;
     if (response instanceof Error) {
-
       // penanganan client error secara internal.
       if (response instanceof ClientError) {
         const newResponse = h.response({
@@ -161,8 +160,8 @@ const init = async () => {
       const newResponse = h.response({
         status: 'error',
         message: 'terjadi kegagalan pada server kami',
-      });
-      newResponse.code(500);
+      }).code(500);
+
       return newResponse;
     }
     // jika bukan error, lanjutkan dengan response sebelumnya (tanpa terintervensi)

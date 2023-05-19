@@ -1,22 +1,23 @@
 const mapAlbumSongs = (results) => {
-  album = {
+  const album = {
     id: results[0].id,
     name: results[0].name,
     year: results[0].year,
-    songs: []
-  }
+    songs: [],
+  };
 
-  results.forEach(song => {
-    if (song.songId)
+  results.forEach((song) => {
+    if (song.songId) {
       album.songs.push({
         id: song.songId,
         title: song.title,
-        performer: song.performer
-      })
+        performer: song.performer,
+      });
+    }
   });
 
   return album;
-}
+};
 
 const mapDBToModelPlaylist = (dataFromDB) => {
   const playlist = {
