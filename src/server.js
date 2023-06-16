@@ -1,8 +1,9 @@
-require('dotenv').config();
-
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+
+const path = require('path');
 const ClientError = require('./exceptions/ClientError');
+const config = require('./utils/config');
 
 // albums
 const albums = require('./api/albums');
@@ -40,10 +41,27 @@ const collaborations = require('./api/collaborations');
 const CollaborationService = require('./services/postgres/CollaborationService');
 const CollaborationValidator = require('./validator/collaborations');
 
+// Exports
+const exportx = require('./api/exports');
+const ProducerService = require('./services/rabbitmq/ProducerService');
+const ExportValidator = require('./validator/exports');
+
+// Album likes
+const albumLike = require('./api/albumLikes');
+const UserAlbumLikeService = require('./services/postgres/UserAlbumLikeService');
+
+// cache
+const CacheService = require('./services/redis/CacheService');
+
+// uploads
+const uploads = require('./api/uploads');
+const StorageService = require('./services/storage/StorageService');
+const UploadValidator = require('./validator/uploads');
+
 const init = async () => {
   const server = Hapi.server({
-    port: process.env.PORT,
-    host: process.env.HOST,
+    port: config.app.port,
+    host: config.app.host,
     routes: {
       cors: {
         origin: ['*'],
@@ -59,12 +77,12 @@ const init = async () => {
   ]);
 
   server.auth.strategy('playlistsapp_jwt', 'jwt', {
-    keys: process.env.ACCESS_TOKEN_KEY,
+    keys: config.app.accessTokenKey,
     verify: {
       aud: false,
       iss: false,
       sub: false,
-      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+      maxAgeSec: config.app.accessTokenAge,
     },
     validate: (artifacts) => ({
       isValid: true,
@@ -81,7 +99,10 @@ const init = async () => {
 
   const playlistService = new PlaylistService(null);
   const playlisSongService = new PlaylistSongService(songService);
-  const collaborationService = new CollaborationService();
+  const cacheService = new CacheService();
+  const collaborationService = new CollaborationService(cacheService);
+  const userAlbumLikeService = new UserAlbumLikeService(cacheService);
+  const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/images'));
 
   await server.register([
     {
@@ -135,6 +156,30 @@ const init = async () => {
         service: collaborationService,
         playlistService,
         validator: CollaborationValidator,
+      },
+    },
+    {
+      plugin: exportx,
+      options: {
+        service: ProducerService,
+        playlistService,
+        validator: ExportValidator,
+      },
+    },
+    {
+      plugin: albumLike,
+      options: {
+        service: userAlbumLikeService,
+        albumService,
+        validator: AlbumValidator,
+      },
+    },
+    {
+      plugin: uploads,
+      options: {
+        service: storageService,
+        albumService,
+        validator: UploadValidator,
       },
     },
   ]);

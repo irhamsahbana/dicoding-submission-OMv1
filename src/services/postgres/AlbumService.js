@@ -47,7 +47,6 @@ class AlbumService {
     let result = await this._pool.query(query);
 
     if (!result.rowCount) throw new NotFoundError('Album tidak ditemukan');
-
     result = mapAlbumSongs(result.rows);
 
     return result;
@@ -77,6 +76,17 @@ class AlbumService {
     if (!result.rowCount) throw new NotFoundError('Album gagal diperbarui. Id tidak ditemukan');
 
     return result.rows[0].id;
+  }
+
+  async editAlbumCoverById(id, coverUrl) {
+    const query = {
+      text: 'UPDATE albums SET "coverUrl" = $1 WHERE id = $2 RETURNING id',
+      values: [coverUrl, id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
   }
 }
 

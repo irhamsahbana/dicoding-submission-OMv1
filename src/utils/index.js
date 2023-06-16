@@ -1,10 +1,17 @@
+const config = require('./config');
+
 const mapAlbumSongs = (results) => {
   const album = {
     id: results[0].id,
     name: results[0].name,
     year: results[0].year,
+    coverUrl: null,
     songs: [],
   };
+
+  if (results[0].coverUrl !== null) {
+    album.coverUrl = `http://${config.app.host}:${config.app.port}/uploads/images/${results[0].coverUrl}`;
+  }
 
   results.forEach((song) => {
     if (song.songId) {
