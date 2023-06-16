@@ -45,7 +45,7 @@ class AlbumLikesService {
       return { likes: JSON.parse(result), isCache: 1 };
     } catch (error) {
       const query = {
-        text: 'SELECT user_id FROM user_album_likes WHERE album_id = $1',
+        text: 'SELECT "userId" FROM user_album_likes WHERE "albumId" = $1',
         values: [albumId],
       };
 
