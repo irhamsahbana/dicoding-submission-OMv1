@@ -3,7 +3,7 @@ const amqp = require('amqplib');
 const PlaylistSongService = require('./PlaylistSongService');
 const MailSender = require('./MailSender');
 const Listener = require('./Listener');
-const config = require('../src/utils/config');
+const config = require('./config');
 
 const init = async () => {
   const playlistSongService = new PlaylistSongService();
